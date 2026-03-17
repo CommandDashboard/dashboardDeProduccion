@@ -679,6 +679,57 @@ export default function BatchesPage() {
                 </div>
               )}
 
+              {/* ── Métricas resumen ── */}
+              {!loading && batches.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {[
+                    {
+                      label: 'Total Lotes',
+                      value: batches.length,
+                      icon: 'inventory_2',
+                      color: 'text-slate-900 dark:text-slate-100',
+                      bg: 'bg-slate-50 dark:bg-slate-800/50',
+                    },
+                    {
+                      label: 'Total Piezas',
+                      value: batches.reduce((s, b) => s + (b.piece_count ?? 0), 0),
+                      icon: 'widgets',
+                      color: 'text-[#1173d4]',
+                      bg: 'bg-blue-50/60 dark:bg-blue-900/10',
+                    },
+                    {
+                      label: 'Homogéneos',
+                      value: batches.filter(b => b.ai_status === 'Homogéneo').length,
+                      icon: 'check_circle',
+                      color: 'text-emerald-600 dark:text-emerald-400',
+                      bg: 'bg-emerald-50/60 dark:bg-emerald-900/10',
+                    },
+                    {
+                      label: 'Con Alerta',
+                      value: batches.filter(b => b.ai_status && FLAGGED_STATUSES.includes(b.ai_status)).length,
+                      icon: 'warning',
+                      color: 'text-amber-600 dark:text-amber-400',
+                      bg: 'bg-amber-50/60 dark:bg-amber-900/10',
+                    },
+                    {
+                      label: 'Pendientes',
+                      value: batches.filter(b => !b.ai_status || b.ai_status === 'Pendiente').length,
+                      icon: 'hourglass_empty',
+                      color: 'text-slate-500 dark:text-slate-400',
+                      bg: 'bg-slate-50 dark:bg-slate-800/50',
+                    },
+                  ].map(({ label, value, icon, color, bg }) => (
+                    <div key={label} className={`${bg} border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col gap-2`}>
+                      <div className="flex items-center gap-2">
+                        <span className={`material-symbols-outlined text-[18px] ${color}`}>{icon}</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{label}</span>
+                      </div>
+                      <span className={`text-2xl font-black tracking-tight ${color}`}>{value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {/* Tabs — scroll horizontal en móvil */}
               <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
                 <div className="border-b border-slate-200 dark:border-slate-800 flex gap-4 sm:gap-8 min-w-max">

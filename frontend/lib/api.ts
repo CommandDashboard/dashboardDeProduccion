@@ -56,6 +56,22 @@ export const getHeaders = (): HeadersInit => {
   };
 };
 
+// Generic fetcher for SWR
+export const fetcher = async (url: string) => {
+  const response = await fetch(url, {
+    headers: getHeaders(),
+    credentials: 'include',
+  });
+  if (!response.ok) {
+    const error = new Error('An error occurred while fetching the data.');
+    const info = await response.json();
+    (error as any).status = response.status;
+    (error as any).info = info;
+    throw error;
+  }
+  return response.json();
+};
+
 // Fetch dashboard statistics
 export const fetchDashboardStats = async () => {
   try {
@@ -139,12 +155,16 @@ export const uploadImage = async (file: File) => {
     const formData = new FormData();
     formData.append('files', file);
 
-    const token = getAuthToken();
+    const headers = getHeaders();
+    if (headers instanceof Headers) {
+      headers.delete('Content-Type');
+    } else {
+      delete (headers as any)['Content-Type'];
+    }
+
     const response = await fetch(`${API_BASE_URL}${api.endpoints.upload}`, {
       method: 'POST',
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
+      headers,
       credentials: 'include',
       body: formData,
     });

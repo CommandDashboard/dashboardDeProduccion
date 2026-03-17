@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Cosentino Quality Tracker",
+  title: "Visiotracker AI",
   description: "Sistema de control de calidad para producción de materiales",
 };
+
+import { AuthProvider } from "./components/AuthContext";
 
 export default function RootLayout({
   children,
@@ -18,7 +20,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
       </head>
       <body className="font-inter antialiased">
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

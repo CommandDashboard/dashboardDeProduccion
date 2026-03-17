@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Link from 'next/link';
-import { fetchAllBatches } from '@/lib/api';
+import useSWR from 'swr';
+import { fetcher, api } from '@/lib/api';
 
 // -- TYPES & INTERFACES --
 interface Batch {
@@ -19,26 +20,17 @@ interface Batch {
 type FilterTab = 'pendientes' | 'revision' | 'aprobados' | 'todos';
 
 export default function Dashboard() {
-  const [allBatches, setAllBatches] = useState<Batch[]>([]);
-  const [activeTab, setActiveTab] = useState<FilterTab>('pendientes');
-  const [loading, setLoading] = useState(true);
+  // -- SWR HOOKS --
+  const { data: batchesData, error: batchesError, isLoading: loadingBatches } = useSWR(
+    `${api.baseURL}${api.endpoints.batches}?populate=*&publicationState=preview&sort=createdAt:desc&pagination[pageSize]=200`,
+    fetcher,
+    { refreshInterval: 15000 }
+  );
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        const batches = await fetchAllBatches();
-        setAllBatches(batches);
-      } catch (err) {
-        console.error('Error loading batches:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-    const interval = setInterval(load, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  const allBatches = batchesData?.data || [];
+  const loading = loadingBatches;
+
+  const [activeTab, setActiveTab] = useState<FilterTab>('pendientes');
 
   // -- HELPERS --
   const getBatchId = (b: Batch) => b.batchId || b.batch_id || `#${b.id}`;
@@ -76,14 +68,13 @@ export default function Dashboard() {
       return <div className="flex items-center gap-1.5"><div className="w-16 h-2 bg-green-100 rounded-full overflow-hidden"><div className="h-full bg-green-500 w-full" /></div><span className="text-xs font-bold text-green-600">100%</span></div>;
     }
     if (internalStatus === 'revision') {
-      const fakePct = 70 + (Number(b.id) % 25);
-      return <div className="flex items-center gap-1.5"><div className="w-16 h-2 bg-amber-100 rounded-full overflow-hidden"><div className="h-full bg-amber-500" style={{ width: `${fakePct}%` }} /></div><span className="text-xs font-bold text-amber-600">{fakePct}%</span></div>;
+      return <span className="text-amber-600 text-sm font-bold italic">En revisión...</span>;
     }
     return <span className="text-slate-400 text-sm italic">Calculando...</span>;
   };
 
   // -- FILTERING --
-  const displayedBatches = allBatches.filter(b => {
+  const displayedBatches = allBatches.filter((b: Batch) => {
     if (activeTab === 'todos') return true;
     return getInternalStatus(b) === activeTab;
   });
@@ -119,6 +110,46 @@ export default function Dashboard() {
               </div>
             </div>
           </header>
+
+          {/* Métricas Resumen */}
+          <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined text-[4rem]">inventory_2</span>
+              </div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Lotes</p>
+              <h3 className="text-3xl font-black text-slate-900 dark:text-white">
+                {allBatches.length}
+              </h3>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined text-[4rem]">precision_manufacturing</span>
+              </div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Piezas Hoy</p>
+              <h3 className="text-3xl font-black text-slate-900 dark:text-white">
+                {allBatches.reduce((acc: number, b: Batch) => acc + (b.piece_count || 0), 0)}
+              </h3>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group border-b-4 border-b-[--color-primary]">
+              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform text-[--color-primary]">
+                <span className="material-symbols-outlined text-[4rem]">verified</span>
+              </div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Precisión IA</p>
+              <h3 className="text-3xl font-black text-[--color-primary]">
+                —
+              </h3>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group border-b-4 border-b-red-500">
+              <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-110 transition-transform text-red-500">
+                <span className="material-symbols-outlined text-[4rem]">emergency_home</span>
+              </div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Alertas Crit.</p>
+              <h3 className="text-3xl font-black text-red-500">
+                {allBatches.filter((b: Batch) => getInternalStatus(b) === 'revision').length}
+              </h3>
+            </div>
+          </section>
 
           {/* Módulos principales */}
           <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 mb-8 lg:mb-12">
@@ -227,7 +258,7 @@ export default function Dashboard() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                        {displayedBatches.map((batch) => {
+                        {displayedBatches.map((batch: Batch) => {
                           const internalLogicStatus = getInternalStatus(batch);
                           return (
                             <tr key={batch.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
@@ -238,7 +269,7 @@ export default function Dashboard() {
                               <td className="px-6 py-4">{getStatusBadge(internalLogicStatus, batch.ai_status || batch.status || '')}</td>
                               <td className="px-6 py-4 text-right">
                                 <Link
-                                  href={`/batches/${batch.id}`}
+                                  href={`/batches/${batch.id}/diagnosis`}
                                   className="inline-flex items-center justify-center size-8 rounded-full bg-slate-100 hover:bg-[--color-primary] hover:text-white dark:bg-slate-800 dark:hover:bg-[--color-primary] text-slate-600 dark:text-slate-300 transition-colors"
                                 >
                                   <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -253,7 +284,7 @@ export default function Dashboard() {
 
                   {/* Vista móvil: cards */}
                   <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
-                    {displayedBatches.map((batch) => {
+                    {displayedBatches.map((batch: Batch) => {
                       const internalLogicStatus = getInternalStatus(batch);
                       return (
                         <div key={batch.id} className="p-4">
@@ -270,7 +301,7 @@ export default function Dashboard() {
                               {getPerformanceIndicator(batch, internalLogicStatus)}
                             </div>
                             <Link
-                              href={`/batches/${batch.id}`}
+                              href={`/batches/${batch.id}/diagnosis`}
                               className="inline-flex items-center gap-1 text-xs font-bold text-[--color-primary] hover:underline"
                             >
                               Ver

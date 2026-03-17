@@ -481,6 +481,7 @@ export interface ApiBatchBatch extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     material: Schema.Attribute.Relation<'oneToOne', 'api::material.material'>;
     piece_count: Schema.Attribute.Integer;
+    pieces: Schema.Attribute.Relation<'oneToMany', 'api::piece.piece'>;
     production_lines: Schema.Attribute.Relation<
       'oneToMany',
       'api::production-line.production-line'
@@ -580,7 +581,7 @@ export interface ApiPiecePiece extends Struct.CollectionTypeSchema {
   };
   attributes: {
     ai_recommendation: Schema.Attribute.String;
-    batch: Schema.Attribute.Relation<'oneToOne', 'api::batch.batch'>;
+    batch: Schema.Attribute.Relation<'manyToOne', 'api::batch.batch'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -591,6 +592,7 @@ export interface ApiPiecePiece extends Struct.CollectionTypeSchema {
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::piece.piece'> &
       Schema.Attribute.Private;
+    photo: Schema.Attribute.Media<'images'>;
     polishing_grade: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     quality_status: Schema.Attribute.String;

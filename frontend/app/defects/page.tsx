@@ -81,11 +81,11 @@ async function buildAnnotatedImageFile(
         ctx.fillText(String(i + 1), cx + radius * 0.6, cy - radius * 0.6);
       });
 
-      const ext = originalFileName.match(/\.(png|gif|webp)$/i)?.[0]?.toLowerCase() ?? '.jpg';
+      const safeExt = originalFileName.match(/\.(png|gif|webp|jpeg|jpg)$/i)?.[0]?.toLowerCase() ?? '.jpg';
       const mimeType =
-        ext === '.png' ? 'image/png' :
-          ext === '.gif' ? 'image/gif' :
-            ext === '.webp' ? 'image/webp' :
+        safeExt === '.png' ? 'image/png' :
+          safeExt === '.gif' ? 'image/gif' :
+            safeExt === '.webp' ? 'image/webp' :
               'image/jpeg';
 
       canvas.toBlob(
@@ -231,6 +231,14 @@ export default function DefectsPage() {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Saneamiento y validación de formato
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!validTypes.includes(file.type)) {
+      alert('Formato de imagen no soportado. Por favor, sube una imagen JPG o PNG.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
     setUploadedFile(file);
     setDefectMarkers([]);
     setAiResult(null);
@@ -336,6 +344,7 @@ export default function DefectsPage() {
                 ...(formData.polishing_grade && { polishing_grade: formData.polishing_grade }),
                 ...(formData.surface_brightness && { surface_brightness: formData.surface_brightness }),
                 ...(formData.tone_homogeneity && { tone_homogeneity: formData.tone_homogeneity }),
+                ...(imageId && { photo: imageId }),
               },
             }),
           });
@@ -409,7 +418,7 @@ export default function DefectsPage() {
                     <div className="text-center select-none">
                       <span className="material-symbols-outlined text-6xl text-slate-300">add_photo_alternate</span>
                       <p className="text-slate-400 text-sm mt-2">Haz clic para subir una imagen</p>
-                      <p className="text-slate-500 text-xs mt-1">Formatos: JPG, PNG (Max 10MB)</p>
+                      <p className="text-slate-500 text-xs mt-1">Formatos soportados: JPG, PNG (Max 10MB)</p>
                       <p className="text-slate-500 text-xs mt-1 font-medium text-[--color-primary]">🤖 La IA analizará el defecto automáticamente</p>
                     </div>
                   ) : (
@@ -461,7 +470,7 @@ export default function DefectsPage() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/jpg"
                   onChange={handleImageUpload}
                   className="hidden"
                 />
