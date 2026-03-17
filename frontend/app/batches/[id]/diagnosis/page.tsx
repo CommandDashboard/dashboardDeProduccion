@@ -157,7 +157,7 @@ export default function BatchDiagnosisPage() {
   // ── Fetch batch ──
   useEffect(() => {
     setLoadingBatch(true);
-    fetch(`http://localhost:1337/api/batches?filters[$or][0][documentId][$eq]=${rawId}&filters[$or][1][idBatch][$eq]=${rawId}&filters[$or][2][id][$eq]=${rawId}&populate=material`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337'}/api/batches?filters[$or][0][documentId][$eq]=${rawId}&filters[$or][1][idBatch][$eq]=${rawId}&filters[$or][2][id][$eq]=${rawId}&populate=material`)
       .then(r => r.json())
       .then(d => {
         setBatch(d.data && d.data.length > 0 ? d.data[0] : null);
@@ -172,7 +172,7 @@ export default function BatchDiagnosisPage() {
     setLoadingPieces(true);
     // Filter pieces by their batch relation using Strapi v5 filter syntax
     fetch(
-      `http://localhost:1337/api/pieces?filters[batch][documentId][$eq]=${batch.documentId}&pagination[pageSize]=100&sort=createdAt:asc`
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337'}/api/pieces?filters[batch][documentId][$eq]=${batch.documentId}&pagination[pageSize]=100&sort=createdAt:asc`
     )
       .then(r => r.json())
       .then(d => setPieces(d.data ?? []))
@@ -202,7 +202,7 @@ export default function BatchDiagnosisPage() {
     const newStatus = accept ? 'Homogéneo' : 'No Homogéneo';
     setActionLoading(true);
     try {
-      await fetch(`http://localhost:1337/api/batches/${batch.documentId}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337'}/api/batches/${batch.documentId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: { ai_status: newStatus } }),
