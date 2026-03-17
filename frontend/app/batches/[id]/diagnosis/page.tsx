@@ -224,24 +224,24 @@ export default function BatchDiagnosisPage() {
       <div className="flex h-screen overflow-hidden">
         <Sidebar />
 
-        <main className="flex-1 ml-64 flex flex-col min-w-0 overflow-hidden">
+        <main className="flex-1 lg:ml-64 flex flex-col min-w-0 overflow-hidden">
 
           {/* ── Header ── */}
-          <header className="h-16 flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 sticky top-0 z-10">
-            <div className="flex items-center gap-4">
+          <header className="flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-8 py-3 pt-14 sm:pt-3 lg:pt-3 sticky top-0 z-10">
+            <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-slate-400">factory</span>
-              <h2 className="text-lg font-semibold tracking-tight">Cosentino Quality Tracker</h2>
+              <h2 className="text-base sm:text-lg font-semibold tracking-tight hidden sm:block">Cosentino Quality Tracker</h2>
             </div>
             <Link
               href="/batches"
-              className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-sm font-medium transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-              Volver a Lotes
+              <span className="hidden sm:inline">Volver a Lotes</span>
             </Link>
           </header>
 
-          <div className="flex-1 overflow-y-auto p-8 space-y-8">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8">
 
             {/* ── Breadcrumb + Title ── */}
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
@@ -251,7 +251,7 @@ export default function BatchDiagnosisPage() {
                   <span className="material-symbols-outlined text-[12px]">chevron_right</span>
                   <span className="text-[--color-primary] font-medium">Lote #{batch?.idBatch ?? rawId}</span>
                 </nav>
-                <h1 className="text-3xl font-black tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
                   Detalle del Lote{' '}
                   <span className="text-[--color-primary]">#{batch?.idBatch ?? rawId}</span>
                 </h1>
@@ -347,23 +347,25 @@ export default function BatchDiagnosisPage() {
             {/* ── Tabs (only if there's real data) ── */}
             {!loading && batch && (
               <>
-                <div className="border-b border-slate-200 dark:border-slate-800 flex gap-8">
-                  {([
-                    { key: 'detalle', label: 'Ver Detalle', icon: 'info' },
-                    { key: 'calidad', label: 'Análisis de Calidad', icon: 'monitoring' },
-                  ] as const).map(({ key, label, icon }) => (
-                    <button
-                      key={key}
-                      onClick={() => setActiveTab(key)}
-                      className={`pb-3 flex items-center gap-2 text-sm transition-colors whitespace-nowrap ${activeTab === key
-                        ? 'font-bold border-b-2 border-[--color-primary] text-[--color-primary]'
-                        : 'font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                        }`}
-                    >
-                      <span className="material-symbols-outlined text-[18px]">{icon}</span>
-                      {label}
-                    </button>
-                  ))}
+                <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                  <div className="border-b border-slate-200 dark:border-slate-800 flex gap-6 sm:gap-8 min-w-max">
+                    {([
+                      { key: 'detalle', label: 'Ver Detalle', icon: 'info' },
+                      { key: 'calidad', label: 'Análisis de Calidad', icon: 'monitoring' },
+                    ] as const).map(({ key, label, icon }) => (
+                      <button
+                        key={key}
+                        onClick={() => setActiveTab(key)}
+                        className={`pb-3 flex items-center gap-2 text-sm transition-colors whitespace-nowrap ${activeTab === key
+                          ? 'font-bold border-b-2 border-[--color-primary] text-[--color-primary]'
+                          : 'font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                          }`}
+                      >
+                        <span className="material-symbols-outlined text-[18px]">{icon}</span>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* ══════════════════════════════════════ TAB: DETALLE */}

@@ -294,7 +294,7 @@ export default function PieceDetailPage() {
         return (
             <div className="flex h-screen bg-[--color-background-light] dark:bg-[--color-background-dark]">
                 <Sidebar />
-                <main className="flex-1 ml-64 flex items-center justify-center">
+                <main className="flex-1 lg:ml-64 flex items-center justify-center pt-16 lg:pt-0">
                     <div className="flex flex-col items-center gap-4 text-slate-400">
                         <span className="material-symbols-outlined text-5xl animate-spin">progress_activity</span>
                         <p className="text-sm">Cargando especificaciones de pieza...</p>
@@ -308,7 +308,7 @@ export default function PieceDetailPage() {
         return (
             <div className="flex h-screen bg-[--color-background-light] dark:bg-[--color-background-dark]">
                 <Sidebar />
-                <main className="flex-1 ml-64 flex items-center justify-center">
+                <main className="flex-1 lg:ml-64 flex items-center justify-center pt-16 lg:pt-0">
                     <div className="text-center">
                         <span className="material-symbols-outlined text-5xl text-red-400 mb-4 block">error</span>
                         <p className="text-lg font-bold text-slate-700 dark:text-slate-300">{error || 'Pieza no encontrada'}</p>
@@ -331,7 +331,7 @@ export default function PieceDetailPage() {
         <div className="bg-[--color-background-light] dark:bg-[--color-background-dark] min-h-screen flex">
             <Sidebar />
 
-            <main className="flex-1 ml-64 overflow-y-auto p-8">
+            <main className="flex-1 lg:ml-64 overflow-y-auto p-4 sm:p-8 pt-16 sm:pt-8 lg:pt-8">
                 <div className="max-w-5xl mx-auto">
 
                     {/* ── Breadcrumb + Back ── */}
