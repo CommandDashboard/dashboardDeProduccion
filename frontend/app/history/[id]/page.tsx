@@ -174,9 +174,11 @@ export default function PieceDetailPage() {
         setLoading(true);
         setError(null);
         try {
+            const isNumericId = /^\d+$/.test(id);
             const url =
                 `${API_BASE}/api/pieces` +
-                `?filters[id][$eq]=${id}` +
+                `?filters[$or][0][id][$eq]=${id}` +
+                `${!isNumericId ? `&filters[$or][1][documentId][$eq]=${id}` : ''}` +
                 `&populate[0]=batch` +
                 `&populate[1]=defects` +
                 `&populate[2]=defects.image` +

@@ -42,6 +42,7 @@ export default factories.createCoreController('api::defect.defect', ({ strapi })
 
                     const pieceData: any = {
                         sku: pieceId,
+                        photo: image || null,
                         publishedAt: new Date(),
                     };
                     if (batch) {
@@ -62,10 +63,13 @@ export default factories.createCoreController('api::defect.defect', ({ strapi })
             if (pieceEntity) {
                 try {
                     await strapi.entityService.update('api::piece.piece', pieceEntity.id, {
-                        data: { quality_status: qualityStatus } as any,
+                        data: { 
+                            quality_status: qualityStatus,
+                            ...(image && !pieceEntity.photo ? { photo: image } : {})
+                        } as any,
                     });
                 } catch (qErr) {
-                    console.warn('[Defect] Could not update piece quality_status:', qErr);
+                    console.warn('[Defect] Could not update piece quality_status/photo:', qErr);
                 }
             }
 

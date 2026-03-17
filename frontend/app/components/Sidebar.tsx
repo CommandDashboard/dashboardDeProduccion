@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { logout } from '@/lib/api';
+import { usePathname } from 'next/navigation';
+import { api } from '@/lib/api';
+import { useAuth } from './AuthContext';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
@@ -27,7 +28,7 @@ export function HamburgerButton({ onClick }: { onClick: () => void }) {
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
+  const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
 
   // Cerrar sidebar al cambiar de ruta en móvil
@@ -50,12 +51,7 @@ export default function Sidebar() {
   };
 
   const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-      window.location.href = '/login';
-    }
+    logout();
   };
 
   const navLinks = [
@@ -112,7 +108,7 @@ export default function Sidebar() {
               />
             </div>
             <p className="text-slate-500 dark:text-slate-400 text-xs font-medium text-center">
-              COSENTINO QUALITY TRACKER
+              VISIOTRACKER AI
             </p>
           </div>
         </div>
@@ -142,8 +138,12 @@ export default function Sidebar() {
               <span className="material-symbols-outlined text-slate-500 text-sm">person</span>
             </div>
             <div className="flex flex-col flex-1 min-w-0">
-              <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">RICARDO</span>
-              <span className="text-[10px] text-slate-500">Turno Indefinido</span>
+              <span className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase truncate">
+                {user?.username || 'Invitado'}
+              </span>
+              <span className="text-[10px] text-slate-500">
+                {user?.role?.name || 'Operario'}
+              </span>
             </div>
           </div>
           <button

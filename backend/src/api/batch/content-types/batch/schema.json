@@ -34,6 +34,12 @@
     },
     "piece_count": {
       "type": "integer"
+    },
+    "pieces": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::piece.piece",
+      "mappedBy": "batch"
     }
   }
 }

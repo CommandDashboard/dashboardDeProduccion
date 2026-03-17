@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useState, useEffect, useMemo } from 'react';
 import Sidebar from '../../../components/Sidebar';
 import Link from 'next/link';
+import VisualBatchMap from '../../../components/VisualBatchMap';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -25,6 +26,16 @@ interface Batch {
   material?: Material | null;
 }
 
+interface Defect {
+  id: number;
+  documentId: string;
+  defect_type: string;
+  severity: string;
+  location_x: number;
+  location_y: number;
+  description?: string;
+}
+
 interface Piece {
   id: number;
   documentId: string;
@@ -38,6 +49,10 @@ interface Piece {
   quality_status: string | null;
   inspection_date: string | null;
   ai_recommendation: string | null;
+  defects?: Defect[];
+  photo?: {
+    url: string;
+  } | null;
 }
 
 // ─── Algorithm helpers ────────────────────────────────────────────────────────
@@ -150,7 +165,7 @@ export default function BatchDiagnosisPage() {
   const [pieces, setPieces] = useState<Piece[]>([]);
   const [loadingBatch, setLoadingBatch] = useState(true);
   const [loadingPieces, setLoadingPieces] = useState(true);
-  const [activeTab, setActiveTab] = useState<'detalle' | 'calidad'>('detalle');
+  const [activeTab, setActiveTab] = useState<'detalle' | 'calidad' | 'mapa'>('detalle');
   const [actionLoading, setActionLoading] = useState(false);
   const [actionDone, setActionDone] = useState<string | null>(null);
 
@@ -172,7 +187,7 @@ export default function BatchDiagnosisPage() {
     setLoadingPieces(true);
     // Filter pieces by their batch relation using Strapi v5 filter syntax
     fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337'}/api/pieces?filters[batch][documentId][$eq]=${batch.documentId}&pagination[pageSize]=100&sort=createdAt:asc`
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337'}/api/pieces?filters[batch][documentId][$eq]=${batch.documentId}&pagination[pageSize]=100&sort=createdAt:asc&populate[defects][populate]=image&populate=photo`
     )
       .then(r => r.json())
       .then(d => setPieces(d.data ?? []))
@@ -230,7 +245,7 @@ export default function BatchDiagnosisPage() {
           <header className="flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-8 py-3 pt-14 sm:pt-3 lg:pt-3 sticky top-0 z-10">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-slate-400">factory</span>
-              <h2 className="text-base sm:text-lg font-semibold tracking-tight hidden sm:block">Cosentino Quality Tracker</h2>
+              <h2 className="text-base sm:text-lg font-semibold tracking-tight hidden sm:block">Visiotracker AI</h2>
             </div>
             <Link
               href="/batches"
@@ -352,6 +367,7 @@ export default function BatchDiagnosisPage() {
                     {([
                       { key: 'detalle', label: 'Ver Detalle', icon: 'info' },
                       { key: 'calidad', label: 'Análisis de Calidad', icon: 'monitoring' },
+                      { key: 'mapa', label: 'Mapa Visual', icon: 'view_quilt' },
                     ] as const).map(({ key, label, icon }) => (
                       <button
                         key={key}
@@ -557,7 +573,23 @@ export default function BatchDiagnosisPage() {
                   </div>
                 )}
 
-                {/* ══════════════════════════════════════ TAB: CALIDAD */}
+                {/* ══════════════════════════════════════ TAB: MAPA */}
+                {activeTab === 'mapa' && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between mb-2">
+                       <div>
+                         <h4 className="text-lg font-bold">Mapa Visual del Lote</h4>
+                         <p className="text-sm text-slate-500">Distribución de piezas y detección de defectos en tiempo real.</p>
+                       </div>
+                       <div className="flex gap-4 text-[10px] font-bold uppercase tracking-widest">
+                         <div className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-red-500" /> Crítico</div>
+                         <div className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-amber-500" /> Medio</div>
+                         <div className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-blue-500" /> Leve</div>
+                       </div>
+                    </div>
+                    <VisualBatchMap pieces={pieces} />
+                  </div>
+                )}
                 {activeTab === 'calidad' && (
                   <div className="space-y-8">
 

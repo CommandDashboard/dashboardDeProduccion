@@ -53,13 +53,13 @@ export default {
         }
       }
 
-      // Automatically give public permissions to the frontend endpoints
+      // Automatically give public and authenticated permissions to the frontend endpoints
       try {
-        const publicRole = await strapi.db
+        const roles = await strapi.db
           .query('plugin::users-permissions.role')
-          .findOne({ where: { type: 'public' } });
+          .findMany({ where: { type: ['public', 'authenticated'] } });
 
-        if (publicRole) {
+        if (roles && roles.length > 0) {
           const permissionsToCreate = [
             { action: 'api::defect.defect.find' },
             { action: 'api::defect.defect.findOne' },
@@ -79,21 +79,23 @@ export default {
             { action: 'api::alert.alert.find' }
           ];
 
-          for (const p of permissionsToCreate) {
-            const exists = await strapi.db
-              .query('plugin::users-permissions.permission')
-              .findOne({ where: { action: p.action, role: publicRole.id } });
-
-            if (!exists) {
-              await strapi.db
+          for (const role of roles) {
+            for (const p of permissionsToCreate) {
+              const exists = await strapi.db
                 .query('plugin::users-permissions.permission')
-                .create({ data: { action: p.action, role: publicRole.id } });
+                .findOne({ where: { action: p.action, role: role.id } });
+
+              if (!exists) {
+                await strapi.db
+                  .query('plugin::users-permissions.permission')
+                  .create({ data: { action: p.action, role: role.id } });
+              }
             }
           }
-          strapi.log.info('Public permissions automatically configured.');
+          strapi.log.info('Public and Authenticated permissions automatically configured.');
         }
       } catch (err) {
-        strapi.log.error('Failed to set public permissions:', err);
+        strapi.log.error('Failed to set role permissions:', err);
       }
 
       // Automatically create a sample batch if no batches exist
@@ -152,8 +154,56 @@ export default {
       } catch (err) {
         strapi.log.error('Failed to create default defects:', err);
       }
+
+      // Automatically create a default user if none exists
+      try {
+        const authenticatedRole = await strapi.db
+          .query('plugin::users-permissions.role')
+          .findOne({ where: { type: 'authenticated' } });
+
+        if (!authenticatedRole) {
+          strapi.log.error('Authenticated role not found. Strapi might not be fully initialized.');
+        } else {
+          const defaultUser = await strapi.db.query('plugin::users-permissions.user').findOne({
+            where: { username: 'admin' }
+          });
+
+          if (!defaultUser) {
+            strapi.log.info('Admin user not found. Creating default admin user...');
+            try {
+              await strapi.service('plugin::users-permissions.user').add({
+                username: 'admin',
+                email: 'admin@cosentino.com',
+                password: 'admin_password_123',
+                role: authenticatedRole.id,
+                provider: 'local',
+                confirmed: true,
+                blocked: false,
+              });
+              strapi.log.info('Default user created successfully: admin / admin_password_123');
+            } catch (createErr: any) {
+              strapi.log.error('Failed to create user via service:', createErr.message);
+            }
+          } else {
+            // Ensure provider is set and password is properly hashed on every startup
+            try {
+              await strapi.service('plugin::users-permissions.user').edit(defaultUser.id, {
+                password: 'admin_password_123',
+                provider: 'local',
+                confirmed: true,
+                blocked: false,
+              });
+              strapi.log.info('Admin user synced successfully.');
+            } catch (updateErr: any) {
+              strapi.log.error('Failed to sync admin user:', updateErr.message);
+            }
+          }
+        }
+      } catch (err: any) {
+        strapi.log.error('Critical failure in default user creation logic:', err.message);
+      }
     } catch (e) {
-      strapi.log.error('Failed to seed materials', e);
+      strapi.log.error('Bootstrap error:', e);
     }
   },
 };
