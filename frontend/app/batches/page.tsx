@@ -136,7 +136,7 @@ function NewBatchModal({
       onClick={handleOverlayClick}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
     >
-      <div className="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
+      <div className="relative bg-white dark:bg-slate-900 w-full max-w-lg mx-4 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
         {/* Modal header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
@@ -494,11 +494,11 @@ export default function BatchesPage() {
 
       <div className="bg-[--color-background-light] dark:bg-[--color-background-dark] min-h-screen flex">
         <Sidebar />
-        <main className="flex-1 ml-64 flex flex-col">
+        <main className="flex-1 lg:ml-64 flex flex-col">
           {/* Inline Header with search + Nuevo Lote */}
-          <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-10 px-8 flex items-center justify-between">
+          <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-10 px-4 sm:px-8 py-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pt-14 sm:pt-3 lg:pt-3">
             {/* Search bar */}
-            <div className="relative w-full max-w-md">
+            <div className="relative w-full sm:max-w-md">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">
                 search
               </span>
@@ -520,50 +520,51 @@ export default function BatchesPage() {
             </div>
 
             {/* Right actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 sm:ml-auto">
               <button
                 onClick={() => setShowModal(true)}
                 className="flex items-center gap-2 bg-[--color-primary] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[--color-primary]/90 transition-colors shadow-lg shadow-[--color-primary]/20"
               >
                 <span className="material-symbols-outlined text-sm">add</span>
-                Nuevo Lote
+                <span className="hidden xs:inline sm:inline">Nuevo Lote</span>
+                <span className="sm:hidden">Nuevo</span>
               </button>
             </div>
           </header>
 
-          <div className="p-8">
-            <div className="flex flex-col gap-6">
+          <div className="p-4 sm:p-8">
+            <div className="flex flex-col gap-4 sm:gap-6">
 
               {/* Page title row */}
-              <div className="flex items-end justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
                 <div className="flex flex-col gap-1">
-                  <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+                  <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
                     Listado de Lotes
                   </h2>
-                  <p className="text-slate-500 dark:text-slate-400">
+                  <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">
                     Monitorea y gestiona el estado de calidad de los lotes de todas las líneas de producción.
                   </p>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={exportToCSV}
-                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                   >
                     <span className="material-symbols-outlined text-[20px]">file_download</span>
-                    Exportar CSV
+                    <span className="hidden sm:inline">Exportar CSV</span>
                     {filteredBatches.length > 0 && (
                       <span className="ml-0.5 text-xs text-slate-400">({filteredBatches.length})</span>
                     )}
                   </button>
                   <button
                     onClick={() => setShowFilters((v) => !v)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${showFilters || activeFiltersCount > 0
+                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${showFilters || activeFiltersCount > 0
                       ? 'bg-[--color-primary] text-white border-[--color-primary]'
                       : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
                       }`}
                   >
                     <span className="material-symbols-outlined text-[20px]">filter_list</span>
-                    Filtros
+                    <span className="hidden sm:inline">Filtros</span>
                     {activeFiltersCount > 0 && (
                       <span className="size-5 flex items-center justify-center rounded-full bg-white text-[--color-primary] text-[11px] font-bold">
                         {activeFiltersCount}
@@ -678,118 +679,154 @@ export default function BatchesPage() {
                 </div>
               )}
 
-              {/* Tabs */}
-              <div className="border-b border-slate-200 dark:border-slate-800 flex gap-8">
-                <TabButton tab="all" label="Todos los Lotes" />
-                <TabButton tab="pending" label="Pendientes de Revisión" />
-                <TabButton tab="flagged" label="Marcados" />
-                <TabButton tab="archived" label="Archivados" />
+              {/* Tabs — scroll horizontal en móvil */}
+              <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                <div className="border-b border-slate-200 dark:border-slate-800 flex gap-4 sm:gap-8 min-w-max">
+                  <TabButton tab="all" label="Todos" />
+                  <TabButton tab="pending" label="Pendientes" />
+                  <TabButton tab="flagged" label="Marcados" />
+                  <TabButton tab="archived" label="Archivados" />
+                </div>
               </div>
 
-              {/* Table */}
+              {/* Tabla/Cards de lotes */}
               <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50 dark:bg-slate-800/50">
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800">ID de Lote</th>
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800">Nombre del Material</th>
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800">Fecha de Creación</th>
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800">Piezas</th>
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800 text-center">Estado</th>
-                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800 text-right">Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {loading ? (
-                        <tr>
-                          <td colSpan={6} className="px-6 py-12 text-center">
-                            <div className="flex flex-col items-center gap-3 text-slate-400">
-                              <span className="material-symbols-outlined text-4xl animate-spin">progress_activity</span>
-                              <span className="text-sm">Cargando lotes...</span>
-                            </div>
-                          </td>
-                        </tr>
-                      ) : filteredBatches.length === 0 ? (
-                        <tr>
-                          <td colSpan={6} className="px-6 py-16 text-center">
-                            <div className="flex flex-col items-center gap-3 text-slate-400">
-                              <span className="material-symbols-outlined text-5xl">inventory_2</span>
-                              <div>
-                                <p className="text-sm font-semibold text-slate-500">
-                                  {batches.length === 0
-                                    ? 'No hay lotes disponibles'
-                                    : searchQuery
-                                      ? `Sin resultados para "${searchQuery}"`
-                                      : 'No hay lotes que coincidan con los filtros'}
-                                </p>
-                                {(activeFiltersCount > 0 || activeTab !== 'all' || searchQuery) && (
-                                  <button
-                                    onClick={() => { clearFilters(); setActiveTab('all'); setSearchQuery(''); }}
-                                    className="mt-2 text-xs text-[--color-primary] hover:underline"
-                                  >
-                                    Limpiar filtros y búsqueda
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      ) : (
-                        filteredBatches.map((batch) => (
-                          <tr key={batch.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
-                            <td className="px-6 py-4">
-                              <span className="text-sm font-mono font-bold text-slate-900 dark:text-slate-100">
-                                {batch.idBatch || `#${batch.id}`}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-3">
-                                <div className="size-8 rounded bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center">
-                                  <span className="material-symbols-outlined text-slate-500 dark:text-slate-400 text-[14px]">layers</span>
-                                </div>
-                                <div>
-                                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                                    {batch.material?.name || 'N/A'}
-                                  </span>
-                                  {batch.material?.type && (
-                                    <p className="text-xs text-slate-400">{batch.material.type}</p>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
-                              {formatDate(batch.date_created || batch.createdAt)}
-                            </td>
-                            <td className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-300">
-                              {batch.piece_count ?? '—'}
-                            </td>
-                            <td className="px-6 py-4 text-center">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(batch.ai_status)}`}>
-                                {batch.ai_status || 'Pendiente'}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <Link
-                                href={`/batches/${batch.id}/diagnosis`}
-                                className="text-[--color-primary] text-sm font-bold hover:underline inline-flex items-center gap-1 group-hover:gap-2 transition-all"
-                              >
-                                Ver Detalles
-                                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                              </Link>
-                            </td>
+                {/* Estado vacío / cargando */}
+                {loading ? (
+                  <div className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center gap-3 text-slate-400">
+                      <span className="material-symbols-outlined text-4xl animate-spin">progress_activity</span>
+                      <span className="text-sm">Cargando lotes...</span>
+                    </div>
+                  </div>
+                ) : filteredBatches.length === 0 ? (
+                  <div className="px-6 py-16 text-center">
+                    <div className="flex flex-col items-center gap-3 text-slate-400">
+                      <span className="material-symbols-outlined text-5xl">inventory_2</span>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-500">
+                          {batches.length === 0
+                            ? 'No hay lotes disponibles'
+                            : searchQuery
+                              ? `Sin resultados para "${searchQuery}"`
+                              : 'No hay lotes que coincidan con los filtros'}
+                        </p>
+                        {(activeFiltersCount > 0 || activeTab !== 'all' || searchQuery) && (
+                          <button
+                            onClick={() => { clearFilters(); setActiveTab('all'); setSearchQuery(''); }}
+                            className="mt-2 text-xs text-[--color-primary] hover:underline"
+                          >
+                            Limpiar filtros y búsqueda
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {/* Vista DESKTOP: tabla */}
+                    <div className="hidden md:block overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50 dark:bg-slate-800/50">
+                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800">ID de Lote</th>
+                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800">Material</th>
+                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800">Fecha</th>
+                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800">Piezas</th>
+                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800 text-center">Estado</th>
+                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800 text-right">Acciones</th>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {filteredBatches.map((batch) => (
+                            <tr key={batch.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+                              <td className="px-6 py-4">
+                                <span className="text-sm font-mono font-bold text-slate-900 dark:text-slate-100">
+                                  {batch.idBatch || `#${batch.id}`}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="size-8 rounded bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-slate-500 dark:text-slate-400 text-[14px]">layers</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                                      {batch.material?.name || 'N/A'}
+                                    </span>
+                                    {batch.material?.type && (
+                                      <p className="text-xs text-slate-400">{batch.material.type}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                {formatDate(batch.date_created || batch.createdAt)}
+                              </td>
+                              <td className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                {batch.piece_count ?? '—'}
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(batch.ai_status)}`}>
+                                  {batch.ai_status || 'Pendiente'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <Link
+                                  href={`/batches/${batch.id}/diagnosis`}
+                                  className="text-[--color-primary] text-sm font-bold hover:underline inline-flex items-center gap-1 group-hover:gap-2 transition-all"
+                                >
+                                  Ver Detalles
+                                  <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                                </Link>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
 
-                {/* Footer */}
-                <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between border-t border-slate-200 dark:border-slate-800">
-                  <span className="text-sm text-slate-500 dark:text-slate-400">
+                    {/* Vista MÓVIL: cards */}
+                    <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+                      {filteredBatches.map((batch) => (
+                        <div key={batch.id} className="p-4">
+                          <div className="flex items-start justify-between gap-3 mb-1">
+                            <div className="min-w-0">
+                              <p className="font-mono font-bold text-sm text-slate-900 dark:text-slate-100 truncate">{batch.idBatch || `#${batch.id}`}</p>
+                              <p className="text-sm text-slate-500 truncate">{batch.material?.name || 'N/A'}</p>
+                              {batch.material?.type && <p className="text-xs text-slate-400">{batch.material.type}</p>}
+                            </div>
+                            <span className={`flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${getStatusColor(batch.ai_status)}`}>
+                              {batch.ai_status || 'Pendiente'}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between mt-2 text-sm text-slate-500">
+                            <div className="flex items-center gap-3">
+                              <span><strong className="text-slate-700 dark:text-slate-300">{batch.piece_count ?? '—'}</strong> pzas.</span>
+                              <span className="text-xs">{formatDate(batch.date_created || batch.createdAt)}</span>
+                            </div>
+                            <Link
+                              href={`/batches/${batch.id}/diagnosis`}
+                              className="text-[--color-primary] text-xs font-bold hover:underline inline-flex items-center gap-1"
+                            >
+                              Ver
+                              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Footer pagination */}
+                <div>
+
+                </div>
+                <div className="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between border-t border-slate-200 dark:border-slate-800">
+                  <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                     {filteredBatches.length > 0
-                      ? `Mostrando ${filteredBatches.length} de ${batches.length} lotes`
+                      ? `${filteredBatches.length} de ${batches.length} lotes`
                       : '0 lotes'}
                   </span>
                   <div className="flex gap-2">

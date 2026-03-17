@@ -363,14 +363,14 @@ export default function DefectsPage() {
   return (
     <div className="bg-[--color-background-light] dark:bg-[--color-background-dark] min-h-screen flex">
       <Sidebar />
-      <main className="flex-1 ml-64 overflow-y-auto bg-[--color-background-light] dark:bg-[--color-background-dark] p-8">
+      <main className="flex-1 lg:ml-64 overflow-y-auto bg-[--color-background-light] dark:bg-[--color-background-dark] p-4 sm:p-8 pt-16 sm:pt-8 lg:pt-8">
         <div className="max-w-5xl mx-auto">
-          <header className="mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Registrar Defecto</h2>
-            <p className="text-slate-500 dark:text-slate-400">La IA analiza automáticamente la imagen y sugiere el tipo de fallo y la máquina responsable.</p>
+          <header className="mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">Registrar Defecto</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">La IA analiza automáticamente la imagen y sugiere el tipo de fallo y la máquina responsable.</p>
           </header>
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
             {/* ── Left Column ── */}
             <div className="lg:col-span-7 space-y-6">
 

@@ -317,13 +317,13 @@ export default function HistoryPage() {
       <div className="flex h-screen overflow-hidden">
         <Sidebar />
 
-        <main className="flex-1 ml-64 overflow-y-auto bg-[--color-background-light] dark:bg-[--color-background-dark] p-8">
+        <main className="flex-1 lg:ml-64 overflow-y-auto bg-[--color-background-light] dark:bg-[--color-background-dark] p-4 sm:p-8 pt-16 sm:pt-8 lg:pt-8">
 
           {/* ── Header ── */}
           <header className="mb-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
               <div>
-                <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
                   Historial de Calidad
                 </h2>
                 <p className="text-slate-500 dark:text-slate-400 mt-1">
@@ -705,9 +705,8 @@ export default function HistoryPage() {
                       </td>
                     </tr>
                   ) : (
-                    paginatedPieces.map((piece) => {
+                  paginatedPieces.map((piece) => {
                       const defects = piece.defects ?? [];
-                      // Show most severe defect
                       const worstDefect = defects.sort((a, b) => {
                         const order: Record<string, number> = { Critical: 4, High: 3, Medium: 2, Low: 1 };
                         return (order[b.severity ?? ''] ?? 0) - (order[a.severity ?? ''] ?? 0);
