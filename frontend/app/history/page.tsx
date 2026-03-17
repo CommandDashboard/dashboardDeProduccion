@@ -134,7 +134,7 @@ export default function HistoryPage() {
         `?populate[0]=batch` +
         `&populate[1]=defects` +
         `&sort=createdAt:desc` +
-        `&pagination[pageSize]=500` +
+        `&pagination[pageSize]=100` +
         `&publicationState=preview`;
 
       const response = await fetch(url, {

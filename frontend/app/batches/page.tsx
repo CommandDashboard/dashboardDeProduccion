@@ -73,7 +73,7 @@ function NewBatchModal({
   }, [form.date_created, nextSequence]);
 
   useEffect(() => {
-    fetch('http://localhost:1337/api/materials')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337'}/api/materials`)
       .then((r) => r.json())
       .then((d) => setMaterials(d.data || []));
   }, []);
@@ -108,7 +108,7 @@ function NewBatchModal({
         material: Number(form.materialId),
       };
 
-      const res = await fetch('http://localhost:1337/api/batches', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337'}/api/batches`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: payload }),
@@ -316,7 +316,7 @@ export default function BatchesPage() {
     setLoading(true);
     try {
       const response = await fetch(
-        'http://localhost:1337/api/batches?populate=material&pagination[pageSize]=200&sort=createdAt:desc'
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337'}/api/batches?populate=material&pagination[pageSize]=200&sort=createdAt:desc`
       );
       const data = await response.json();
       setBatches(data.data || []);

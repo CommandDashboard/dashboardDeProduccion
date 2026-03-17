@@ -47,7 +47,7 @@ export default function PieceDetailPage() {
 
   const fetchPiece = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:1337/api/pieces/${id}?populate=*`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337'}/api/pieces/${id}?populate=*`);
       const data = await response.json();
       setPiece(data.data);
     } catch (error) {
